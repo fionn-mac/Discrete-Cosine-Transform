@@ -1,0 +1,182 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>q2</title><meta name="generator" content="MATLAB 9.1"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2017-04-10"><meta name="DC.source" content="q2.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">Code for observing the DCT, Quantized DCT and Reconstructed Image</a></li><li><a href="#3">Selecting the three subwindows</a></li><li><a href="#4">Getting the 8 Point 2D DCT function</a></li><li><a href="#5">Getting the DCT transformed windows</a></li><li><a href="#6">DCT Images</a></li><li><a href="#7">Quantized Images</a></li><li><a href="#8">Reconstructed Images</a></li><li><a href="#10">Comments</a></li></ul></div><h2 id="1">Code for observing the DCT, Quantized DCT and Reconstructed Image</h2><pre class="codeinput"><span class="keyword">function</span> [] = q2()
+</pre><pre class="codeinput">    path = <span class="string">'LAKE.TIF'</span>
+    <span class="comment">% Classical quantization matrix taken from the internet</span>
+    qMat = [16 11 10 16 24 40 51 61;
+    12 12 14 19 26 58 60 55;
+    14 13 16 24 40 57 69 56;
+    14 17 22 29 51 87 80 62;
+    18 22 37 56 68 109 103 77;
+    24 35 55 64 81 104 113 92;
+    49 64 78 87 103 121 120 101;
+    72 92 95 98 112 100 103 99];
+
+    image = imread(path);
+</pre><pre class="codeoutput">
+path =
+
+LAKE.TIF
+
+</pre><h2 id="3">Selecting the three subwindows</h2><pre class="codeinput">    part1 = image(45:52, 420:427);
+    part2 = image(298:305, 427:434);
+    part3 = image(230:237, 30:37);
+</pre><h2 id="4">Getting the 8 Point 2D DCT function</h2><pre class="codeinput">    DCT = create_mat_dct();
+</pre><h2 id="5">Getting the DCT transformed windows</h2><pre class="codeinput">    imDCT1 = myDCT(part1, DCT);
+    imDCT2 = myDCT(part2, DCT);
+    imDCT3 = myDCT(part3, DCT);
+</pre><h2 id="6">DCT Images</h2><pre class="codeinput">    figure, imshow(uint8(imDCT1));
+    title(<span class="string">'DCT image 1'</span>)
+    figure, imshow(uint8(imDCT2));
+    title(<span class="string">'DCT image 2'</span>)
+    figure, imshow(uint8(imDCT3));
+    title(<span class="string">'DCT image 3'</span>)
+
+    imqDCT1 = myDCT_quantization(imDCT1, qMat, 2);
+    imqDCT2 = myDCT_quantization(imDCT2, qMat, 2);
+    imqDCT3 = myDCT_quantization(imDCT3, qMat, 2);
+</pre><img vspace="5" hspace="5" src="q2_01.png" alt=""> <img vspace="5" hspace="5" src="q2_02.png" alt=""> <img vspace="5" hspace="5" src="q2_03.png" alt=""> <h2 id="7">Quantized Images</h2><pre class="codeinput">    figure, imshow(uint8(imqDCT1));
+    title(<span class="string">'Quantized DCT 1'</span>)
+    figure, imshow(uint8(imqDCT2));
+    title(<span class="string">'Quantized DCT 2'</span>)
+    figure, imshow(uint8(imqDCT3));
+    title(<span class="string">'Quantized DCT 3'</span>)
+</pre><img vspace="5" hspace="5" src="q2_04.png" alt=""> <img vspace="5" hspace="5" src="q2_05.png" alt=""> <img vspace="5" hspace="5" src="q2_06.png" alt=""> <h2 id="8">Reconstructed Images</h2><pre class="codeinput">    figure, imshow(uint8(myIDCT(myDCT_dequantization(imqDCT1, qMat, 2), DCT)));
+    title(<span class="string">'Reconstructed image 1'</span>)
+    figure, imshow(uint8(myIDCT(myDCT_dequantization(imqDCT2, qMat, 2), DCT)));
+    title(<span class="string">'Reconstructed image 2'</span>)
+    figure, imshow(uint8(myIDCT(myDCT_dequantization(imqDCT3, qMat, 2), DCT)));
+    title(<span class="string">'Reconstructed image 3'</span>)
+</pre><img vspace="5" hspace="5" src="q2_07.png" alt=""> <img vspace="5" hspace="5" src="q2_08.png" alt=""> <img vspace="5" hspace="5" src="q2_09.png" alt=""> <pre class="codeinput"><span class="keyword">end</span>
+</pre><h2 id="10">Comments</h2><p>On observing the DCT matrix we find that almost all of the information is contained in the upper triangular matrix.</p><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2016b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Code for observing the DCT, Quantized DCT and Reconstructed Image
+function [] = q2()
+    
+    path = 'LAKE.TIF' 
+    % Classical quantization matrix taken from the internet
+    qMat = [16 11 10 16 24 40 51 61;
+    12 12 14 19 26 58 60 55;
+    14 13 16 24 40 57 69 56;
+    14 17 22 29 51 87 80 62;
+    18 22 37 56 68 109 103 77;
+    24 35 55 64 81 104 113 92;
+    49 64 78 87 103 121 120 101;
+    72 92 95 98 112 100 103 99];
+    
+    image = imread(path);
+    
+    %% Selecting the three subwindows
+    part1 = image(45:52, 420:427);
+    part2 = image(298:305, 427:434);
+    part3 = image(230:237, 30:37);
+    
+    %% Getting the 8 Point 2D DCT function
+    DCT = create_mat_dct();
+    
+    %% Getting the DCT transformed windows
+    imDCT1 = myDCT(part1, DCT);
+    imDCT2 = myDCT(part2, DCT);
+    imDCT3 = myDCT(part3, DCT);
+    
+    %% DCT Images
+    figure, imshow(uint8(imDCT1));
+    title('DCT image 1')
+    figure, imshow(uint8(imDCT2));
+    title('DCT image 2')
+    figure, imshow(uint8(imDCT3));
+    title('DCT image 3')
+    
+    imqDCT1 = myDCT_quantization(imDCT1, qMat, 2);
+    imqDCT2 = myDCT_quantization(imDCT2, qMat, 2);
+    imqDCT3 = myDCT_quantization(imDCT3, qMat, 2);
+    
+    %% Quantized Images
+    figure, imshow(uint8(imqDCT1));
+    title('Quantized DCT 1')
+    figure, imshow(uint8(imqDCT2));
+    title('Quantized DCT 2')
+    figure, imshow(uint8(imqDCT3));
+    title('Quantized DCT 3')
+    
+    %% Reconstructed Images
+    figure, imshow(uint8(myIDCT(myDCT_dequantization(imqDCT1, qMat, 2), DCT)));
+    title('Reconstructed image 1')
+    figure, imshow(uint8(myIDCT(myDCT_dequantization(imqDCT2, qMat, 2), DCT)));
+    title('Reconstructed image 2')
+    figure, imshow(uint8(myIDCT(myDCT_dequantization(imqDCT3, qMat, 2), DCT)));
+    title('Reconstructed image 3')
+    
+end
+
+%% Comments
+% On observing the DCT matrix we find that almost all of the information is
+% contained in the upper triangular matrix.
+##### SOURCE END #####
+--></body></html>
