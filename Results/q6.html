@@ -1,0 +1,229 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>q6</title><meta name="generator" content="MATLAB 9.1"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2017-04-03"><meta name="DC.source" content="q6.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">Experimenting to test the hypothesis that DCT provides better compression than DFT</a></li><li><a href="#3">Reading a colour image and making a grayscale copy</a></li><li><a href="#4">Making the mask</a></li><li><a href="#5">Considering R component of RGB image</a></li><li><a href="#6">Considering G component of RGB image</a></li><li><a href="#7">Considering B component of RGB image</a></li><li><a href="#8">Considering Grayscale image</a></li><li><a href="#10">Concatenating R,G,B values into one single image</a></li><li><a href="#11">Finding RSME in RGB image</a></li><li><a href="#12">Finding RSME in Grayscale image</a></li><li><a href="#14">Plotting Error for each image for RGB versions</a></li><li><a href="#15">Plotting Error for each image for Grayscale versions</a></li></ul></div><h2 id="1">Experimenting to test the hypothesis that DCT provides better compression than DFT</h2><p>Better implying lesser error for same mask</p><pre class="codeinput"><span class="keyword">function</span> [] = q6()
+</pre><pre class="codeinput">    DCT = create_mat_dct();
+    errorDFT = ones(10, 1);
+    errorDCT = errorDFT;
+    errorDFTGray = errorDFT;
+    errorDCTGray = errorDFT;
+
+    <span class="keyword">for</span> test = 1:10
+</pre><h2 id="3">Reading a colour image and making a grayscale copy</h2><pre class="codeinput">        image = imread(char(strcat(num2str(test), <span class="string">'.jpeg'</span>)));
+        image2 = rgb2gray(image);
+
+        [x, y, z] = size(image);
+
+        DCTFinalR = ones(x, y);
+        DCTFinalG = ones(x, y);
+        DCTFinalB = ones(x, y);
+
+        DFTFinalR = ones(x, y);
+        DFTFinalG = ones(x, y);
+        DFTFinalB = ones(x, y);
+
+        DFTFinalGray = ones(x, y);
+        DCTFinalGray = ones(x, y);
+
+        window = zeros(8, 8);
+</pre><h2 id="4">Making the mask</h2><pre class="codeinput">        <span class="keyword">for</span> i = 1:8
+            <span class="keyword">for</span> j = 1:8-i+1
+                window(i, j) = 1;
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+
+        <span class="keyword">for</span> i = 1:8:x-7
+            <span class="keyword">for</span> j = 1:8:y-7
+</pre><h2 id="5">Considering R component of RGB image</h2><pre class="codeinput">                subPart = image(i:i+7, j:j+7, 1);
+                DCTFinalR(i:i+7, j:j+7) = myIDCT(myDCT(subPart, DCT).*window, DCT);
+                DFTFinalR(i:i+7, j:j+7) = abs(ifft2(fft2(subPart).*window));
+</pre><h2 id="6">Considering G component of RGB image</h2><pre class="codeinput">                subPart = image(i:i+7, j:j+7, 2);
+                DCTFinalG(i:i+7, j:j+7) = myIDCT(myDCT(subPart, DCT).*window, DCT);
+                DFTFinalG(i:i+7, j:j+7) = abs(ifft2(fft2(subPart).*window));
+</pre><h2 id="7">Considering B component of RGB image</h2><pre class="codeinput">                subPart = image(i:i+7, j:j+7, 3);
+                DCTFinalB(i:i+7, j:j+7) = myIDCT(myDCT(subPart, DCT).*window, DCT);
+                DFTFinalB(i:i+7, j:j+7) = abs(ifft2(fft2(subPart).*window));
+</pre><h2 id="8">Considering Grayscale image</h2><pre class="codeinput">                subPart = image2(i:i+7, j:j+7);
+                DCTFinalGray(i:i+7, j:j+7) = myIDCT(myDCT(subPart, DCT).*window, DCT);
+                DFTFinalGray(i:i+7, j:j+7) = abs(ifft2(fft2(subPart).*window));
+</pre><pre class="codeinput">            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+</pre><h2 id="10">Concatenating R,G,B values into one single image</h2><pre class="codeinput">        DFTFinal = cat(3, DFTFinalR, DFTFinalG, DFTFinalB);
+        DCTFinal = cat(3, DCTFinalR, DCTFinalG, DCTFinalB);
+</pre><h2 id="11">Finding RSME in RGB image</h2><pre class="codeinput">        errorDFT(test) = RMSE(image, uint8(DFTFinal));
+        errorDCT(test) = RMSE(image, uint8(DCTFinal));
+</pre><h2 id="12">Finding RSME in Grayscale image</h2><pre class="codeinput">        errorDFTGray(test) = RMSE(image, uint8(DFTFinalGray));
+        errorDCTGray(test) = RMSE(image, uint8(DCTFinalGray));
+</pre><pre class="codeinput">    <span class="keyword">end</span>
+</pre><h2 id="14">Plotting Error for each image for RGB versions</h2><pre class="codeinput">    figure();
+    hold <span class="string">on</span>;
+    plot(errorDFT);
+    plot(errorDCT);
+    legend(<span class="string">'DFT'</span>, <span class="string">'DCT'</span>);
+    hold <span class="string">off</span>;
+</pre><img vspace="5" hspace="5" src="q6_01.png" alt=""> <h2 id="15">Plotting Error for each image for Grayscale versions</h2><pre class="codeinput">    figure();
+    hold <span class="string">on</span>;
+    plot(errorDFTGray);
+    plot(errorDCTGray);
+    legend(<span class="string">'DFT Gray'</span>, <span class="string">'DCT Gray'</span>);
+    hold <span class="string">off</span>;
+</pre><img vspace="5" hspace="5" src="q6_02.png" alt=""> <pre class="codeinput"><span class="keyword">end</span>
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2016b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Experimenting to test the hypothesis that DCT provides better compression than DFT
+% Better implying lesser error for same mask
+function [] = q6()
+    
+    DCT = create_mat_dct();
+    errorDFT = ones(10, 1);
+    errorDCT = errorDFT;
+    errorDFTGray = errorDFT;
+    errorDCTGray = errorDFT;
+    
+    for test = 1:10
+        %% Reading a colour image and making a grayscale copy
+        image = imread(char(strcat(num2str(test), '.jpeg')));
+        image2 = rgb2gray(image);
+        
+        [x, y, z] = size(image);
+        
+        DCTFinalR = ones(x, y);
+        DCTFinalG = ones(x, y);
+        DCTFinalB = ones(x, y);
+        
+        DFTFinalR = ones(x, y);
+        DFTFinalG = ones(x, y);
+        DFTFinalB = ones(x, y);
+        
+        DFTFinalGray = ones(x, y);
+        DCTFinalGray = ones(x, y);
+        
+        window = zeros(8, 8);
+        
+        %% Making the mask
+        for i = 1:8
+            for j = 1:8-i+1
+                window(i, j) = 1;
+            end
+        end
+    
+        for i = 1:8:x-7
+            for j = 1:8:y-7
+                %% Considering R component of RGB image 
+                subPart = image(i:i+7, j:j+7, 1);
+                DCTFinalR(i:i+7, j:j+7) = myIDCT(myDCT(subPart, DCT).*window, DCT);
+                DFTFinalR(i:i+7, j:j+7) = abs(ifft2(fft2(subPart).*window));
+                
+                %% Considering G component of RGB image
+                subPart = image(i:i+7, j:j+7, 2);
+                DCTFinalG(i:i+7, j:j+7) = myIDCT(myDCT(subPart, DCT).*window, DCT);
+                DFTFinalG(i:i+7, j:j+7) = abs(ifft2(fft2(subPart).*window));
+                
+                %% Considering B component of RGB image
+                subPart = image(i:i+7, j:j+7, 3);
+                DCTFinalB(i:i+7, j:j+7) = myIDCT(myDCT(subPart, DCT).*window, DCT);
+                DFTFinalB(i:i+7, j:j+7) = abs(ifft2(fft2(subPart).*window));
+                
+                %% Considering Grayscale image
+                subPart = image2(i:i+7, j:j+7);
+                DCTFinalGray(i:i+7, j:j+7) = myIDCT(myDCT(subPart, DCT).*window, DCT);
+                DFTFinalGray(i:i+7, j:j+7) = abs(ifft2(fft2(subPart).*window));
+            end
+        end
+        %% Concatenating R,G,B values into one single image 
+        DFTFinal = cat(3, DFTFinalR, DFTFinalG, DFTFinalB);
+        DCTFinal = cat(3, DCTFinalR, DCTFinalG, DCTFinalB);
+        
+        %% Finding RSME in RGB image
+        errorDFT(test) = RMSE(image, uint8(DFTFinal));
+        errorDCT(test) = RMSE(image, uint8(DCTFinal));
+        
+        %% Finding RSME in Grayscale image
+        errorDFTGray(test) = RMSE(image, uint8(DFTFinalGray));
+        errorDCTGray(test) = RMSE(image, uint8(DCTFinalGray));
+    end
+    
+    %% Plotting Error for each image for RGB versions
+    figure(); 
+    hold on;
+    plot(errorDFT);
+    plot(errorDCT);
+    legend('DFT', 'DCT');
+    hold off;
+    
+    %% Plotting Error for each image for Grayscale versions
+    figure(); 
+    hold on;
+    plot(errorDFTGray);
+    plot(errorDCTGray);
+    legend('DFT Gray', 'DCT Gray');
+    hold off;
+end
+
+##### SOURCE END #####
+--></body></html>
